@@ -1,24 +1,44 @@
 import toga
 import webbrowser
+import requests
+import os
+from toga import Image
+
+canvas = toga.Canvas()
+box = toga.Box()
 
 def button_handler(widget):
-    url = 'https://unanet.com'
+    url = 'http://unanet.ycg.com/LogOn?ReturnUrl=%2Fmobile'
     webbrowser.open_new(url)
 
 def build(app):
-    box = toga.Box()
+    
 
-    button = toga.Button("Unanet", on_press=button_handler)
+    button = toga.Button("", on_press=button_handler)
     button.style.padding = 50
     button.style.flex = 1
-    button.style.background_color = 'lightgreen'  
-    button.style.color = 'black'
+
+    button.style.color = 'white'
     button.style.font_family = 'arial'
-    button.style.border_radius = 50  # Set border radius to create hexagon shape
-    button.style.width = 100
-    button.style.height = 100
+    button.style.width = 540
+    button.style.height = 350
+    button.style.font_size = 20
+    button.style.font_weight = 'bold'
+
     box.add(button)
-    box.style.background_color = 'blue'
+
+    # Download and save the image locally
+    response = requests.get('https://upload.wikimedia.org/wikipedia/commons/7/7e/Unanet_Logo.png')
+    with open('unanet_logo.png', 'wb') as f:
+        f.write(response.content)
+
+    # Create a Toga Image object from the downloaded image file
+    image = Image(os.path.abspath('unanet_logo.png'))
+
+    # Set the background image to the Toga Image object
+    button.style.background_color = 'white'
+    button.style.background_image = image
+    button.style.background_size = 'contain'
 
     return box
 
