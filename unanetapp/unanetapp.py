@@ -1,5 +1,6 @@
 import toga
 import webbrowser
+import requests
 
 def button_handler(widget):
     url = 'https://unanet.com'
@@ -9,18 +10,10 @@ def build(app):
     box = toga.Box()
 
     button = toga.Button("Unanet", on_press=button_handler)
-    button.style.width = 100
-    button.style.height = 50
-    button.style.border_width = 0
-    button.style.border_bottom_width = 25
-    button.style.border_bottom_color = 'green'
-    button.style.border_left_width = 13
-    button.style.border_left_color = 'transparent'
-    button.style.border_right_width = 13
-    button.style.border_right_color = 'transparent'
-    button.style.border_top_width = 25
-    button.style.border_top_color = 'green'
-    button.style.color = 'gold'  # Change button text color to gold
+    button.style.padding = 50
+    button.style.flex = 1
+    button.style.background_color = 'green'  # Change button color to blue
+    button.style.color = 'gold'  # Change button text color to white
     button.style.font_family = 'arial'  # Change font to sans-serif
     box.add(button)
     box.style.background_color = 'lightblue'
