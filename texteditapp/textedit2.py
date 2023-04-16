@@ -10,19 +10,9 @@ from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.filechooser import FileChooserIconView
 from kivy.core.window import Window
-import platform
 
-# Set the Window size for better display on Android devices
-if platform == 'android':
-    from jnius import autoclass
-    PythonActivity = autoclass('org.kivy.android.PythonActivity')
-    Window = autoclass('android.view.Window')
-    Window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-    Metrics = autoclass('android.util.DisplayMetrics')
-    metrics = Metrics()
-    PythonActivity.mActivity.getWindowManager().getDefaultDisplay().getMetrics(metrics)
-    Window.size = (metrics.widthPixels, metrics.heightPixels)
-
+Window.size = (360, 640)
+Window.clearcolor = (.5, 1, 1, 1)
 KV = '''
 BoxLayout:
     orientation: "vertical"
