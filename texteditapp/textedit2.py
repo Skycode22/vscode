@@ -1,7 +1,6 @@
 import os
 import docx
 import openpyxl
-import PyPDF2
 from kivy.lang import Builder
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
@@ -78,16 +77,6 @@ class TextEditor(App):
                     self.text_input.text = "\n".join(full_text)
                 except Exception as e:
                     print(f"Error: {e}")
-            elif file_ext == ".pdf":
-                try:
-                    with open(self.current_file, 'rb') as f:
-                        pdf_reader = PyPDF2.PdfReader(f)
-                        full_text = []
-                        for page in pdf_reader.pages:
-                            full_text.append(page.extract_text())
-                        self.text_input.text = "\n".join(full_text)
-                except Exception as e:
-                    print(f"Error: {e}")
             else:
                 try:
                     with open(self.current_file, 'r', encoding='utf-8') as f:
@@ -143,7 +132,7 @@ class TextEditor(App):
             instance.parent.parent.parent.dismiss()
 class Test(App):
     def build(self):
-        return TextEditor()
+        return KV()
 if __name__ == "__main__":
     TextEditor().run()
 
