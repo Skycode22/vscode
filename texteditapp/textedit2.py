@@ -141,6 +141,9 @@ class TextEditor(App):
                 with open(self.current_file, 'w', encoding='utf-8') as f:
                     f.write(self.text_input.text)
             instance.parent.parent.parent.dismiss()
+class Test(App):
+    def build(self):
+        return TextEditor()
 if __name__ == "__main__":
     TextEditor().run()
 
