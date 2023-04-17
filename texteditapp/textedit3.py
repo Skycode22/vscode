@@ -1,7 +1,8 @@
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN, ROW
-
+from docx import Document
+from openpyxl import load_workbook
 
 class TextEditor(toga.App):
     def startup(self):
@@ -31,21 +32,44 @@ class TextEditor(toga.App):
         text = self.text_area.value
 
         # Open a file dialog to choose a file to save
-        file_path = self.main_window.save_file_dialog()
+        file_dialog = self.main_window.save_file_dialog()
+
+        # Determine the file type based on the file extension
+        file_extension = file_dialog.file_path.split('.')[-1]
 
         # Write the text to the file
-        with open(file_path, 'w') as f:
-            f.write(text)
+        if file_extension == 'txt':
+            with open(file_dialog.file_path, 'w') as f:
+                f.write(text)
+        elif file_extension == 'docx':
+            document = Document()
+            document.add_paragraph(text)
+            document.save(file_dialog.file_path)
+        elif file_extension == 'xlsx':
+            wb = load_workbook(filename=file_dialog.file_path)
+            ws = wb.active
+            ws['A1'] = text
+            wb.save(file_dialog.file_path)
 
     def open_file(self, widget):
         # Open a file dialog to choose a file to open
-        file_path = self.main_window.open_file_dialog(title="Open File")
+        file_dialog = self.main_window.open_file_dialog(title="Open File")
+        
+        if file_dialog:  # Check if a file is selected
+            # Determine the file type based on the file extension
+            file_extension = file_dialog[0].split('.')[-1]
 
-        # Check if a valid file path was returned
-        if file_path:
             # Read the contents of the file
-            with open(file_path, 'r') as f:
-                text = f.read()
+            if file_extension == 'txt':
+                with open(file_dialog[0], 'r') as f:
+                    text = f.read()
+            elif file_extension == 'docx':
+                document = Document(file_dialog[0])
+                text = '\n'.join([p.text for p in document.paragraphs])
+            elif file_extension == 'xlsx':
+                wb = load_workbook(filename=file_dialog[0])
+                ws = wb.active
+                text = str(ws['A1'].value)
 
             # Set the text area widget value to the contents of the file
             self.text_area.value = text
