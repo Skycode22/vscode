@@ -1,4 +1,6 @@
 import os
+import android.permissions
+from android.storage import app_storage_path
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -16,7 +18,7 @@ class FileChooserScreen(Screen):
         self.layout = BoxLayout(orientation='vertical')
         self.add_widget(self.layout)
 
-        self.file_chooser = FileChooserIconView(path=os.path.expanduser('~'), filters=['*.docx', '*.xlsx'])
+        self.file_chooser = FileChooserIconView(path=app_storage_path, filters=['*.docx', '*.xlsx'])
         self.file_chooser.bind(on_submit=self.load_document)
         self.layout.add_widget(self.file_chooser)
 
@@ -62,28 +64,35 @@ class EditorScreen(Screen):
             self.text_input.text = '\n'.join([','.join([str(cell.value) for cell in row]) for row in rows])
 
     def save_document(self, instance):
-            if not hasattr(self, 'file_type'):
-                return
+        if not hasattr(self, 'file_type'):
+            return
 
-            text = self.text_input.text
-            lines = text.split('\n')
+        text = self.text_input.text
+        lines = text.split('\n')
 
-            if self.file_type == 'docx':
-                for index, line in enumerate(lines):
-                    if index < len(self.doc.paragraphs):
-                        self.doc.paragraphs[index].text = line
-                    else:
-                        self.doc.add_paragraph(line)
-                self.doc.save(self.file_path)
-            elif self.file_type == 'xlsx':
-                for row_index, line in enumerate(lines):
-                    cells = line.split(',')
-                    for col_index, cell_value in enumerate(cells):
-                        self.ws.cell(row=row_index + 1, column=col_index + 1, value=cell_value)
-                self.wb.save(self.file_path)
+        if self.file_type == 'docx':
+            for index, line in enumerate(lines):
+                if index < len(self.doc.paragraphs):
+                    self.doc.paragraphs[index].text = line
+                else:
+                    self.doc.add_paragraph(line)
+            self.doc.save(self.file_path)
+        elif self.file_type == 'xlsx':
+            for row_index, line in enumerate(lines):
+                cells = line.split(',')
+                for col_index, cell_value in enumerate(cells):
+                    self.ws.cell(row=row_index + 1, column=col_index + 1, value=cell_value)
+            self.wb.save(self.file_path)
 
     def open_file(self, instance):
+        android.permissions.request_permission('android.permission.READ_EXTERNAL_STORAGE', self.handle_permission)
+
+    def handle_permission(self, permission, granted):
+        if granted:
+            self.file_chooser._update_files(app_storage_path)
             self.manager.current = 'filechooser'
+        else:
+            print('Permission not granted')
 
 class DocxEditorApp(App):
     def build(self):
