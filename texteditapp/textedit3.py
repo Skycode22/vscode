@@ -1,83 +1,97 @@
-import toga
-from toga.style import Pack
-from toga.style.pack import COLUMN, ROW
+import os
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.uix.filechooser import FileChooserIconView
+from kivy.uix.label import Label
+from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.textinput import TextInput
 from docx import Document
 from openpyxl import load_workbook
+from openpyxl.utils import get_column_letter
 
-class TextEditor(toga.App):
-    def startup(self):
-        # Create a main window
-        self.main_window = toga.MainWindow(title=self.name)
+class FileChooserScreen(Screen):
+    def __init__(self, **kwargs):
+        super(FileChooserScreen, self).__init__(**kwargs)
+        self.layout = BoxLayout(orientation='vertical')
+        self.add_widget(self.layout)
 
-        # Create a text area widget
-        self.text_area = toga.MultilineTextInput()
+        self.file_chooser = FileChooserIconView(path=os.path.expanduser('~'), filters=['*.docx', '*.xlsx'])
+        self.file_chooser.bind(on_submit=self.load_document)
+        self.layout.add_widget(self.file_chooser)
 
-        # Create a save button widget
-        self.save_button = toga.Button('Save', on_press=self.save_file)
+    def load_document(self, instance, selected, touch):
+        if not selected:
+            return
+        self.manager.get_screen('editor').load_document(selected[0])
+        self.manager.current = 'editor'
 
-        # Create an open button widget
-        self.open_button = toga.Button('Open', on_press=self.open_file)
+class EditorScreen(Screen):
+    def __init__(self, **kwargs):
+        super(EditorScreen, self).__init__(**kwargs)
+        self.layout = BoxLayout(orientation='vertical')
+        self.add_widget(self.layout)
 
-        # Create a horizontal box to hold the text area and buttons
-        box = toga.Box(children=[self.text_area, self.save_button, self.open_button], style=Pack(direction=ROW))
+        self.text_input = TextInput()
+        self.layout.add_widget(self.text_input)
 
-        # Add the box widget to the main window
-        self.main_window.content = box
+        button_layout = BoxLayout(size_hint_y=None, height=50)
+        self.layout.add_widget(button_layout)
 
-        # Show the main window
-        self.main_window.show()
+        self.save_button = Button(text='Save')
+        self.save_button.bind(on_press=self.save_document)
+        button_layout.add_widget(self.save_button)
 
-    def save_file(self, widget):
-        # Get the text from the text area widget
-        text = self.text_area.value
+        self.open_button = Button(text='Open')
+        self.open_button.bind(on_press=self.open_file)
+        button_layout.add_widget(self.open_button)
 
-        # Open a file dialog to choose a file to save
-        file_dialog = self.main_window.save_file_dialog()
+    def load_document(self, file_path):
+        self.file_path = file_path
+        file_extension = os.path.splitext(file_path)[1]
 
-        # Determine the file type based on the file extension
-        file_extension = file_dialog.file_path.split('.')[-1]
+        if file_extension == '.docx':
+            self.file_type = 'docx'
+            self.doc = Document(file_path)
+            self.text_input.text = '\n'.join([para.text for para in self.doc.paragraphs])
+        elif file_extension == '.xlsx':
+            self.file_type = 'xlsx'
+            self.wb = load_workbook(file_path)
+            self.ws = self.wb.active
+            rows = self.ws.iter_rows()
+            self.text_input.text = '\n'.join([','.join([str(cell.value) for cell in row]) for row in rows])
 
-        # Write the text to the file
-        if file_extension == 'txt':
-            with open(file_dialog.file_path, 'w') as f:
-                f.write(text)
-        elif file_extension == 'docx':
-            document = Document()
-            document.add_paragraph(text)
-            document.save(file_dialog.file_path)
-        elif file_extension == 'xlsx':
-            wb = load_workbook(filename=file_dialog.file_path)
-            ws = wb.active
-            ws['A1'] = text
-            wb.save(file_dialog.file_path)
+    def save_document(self, instance):
+            if not hasattr(self, 'file_type'):
+                return
 
-    def open_file(self, widget):
-        # Open a file dialog to choose a file to open
-        file_dialog = self.main_window.open_file_dialog(title="Open File")
-        
-        if file_dialog:  # Check if a file is selected
-            # Determine the file type based on the file extension
-            file_extension = file_dialog[0].split('.')[-1]
+            text = self.text_input.text
+            lines = text.split('\n')
 
-            # Read the contents of the file
-            if file_extension == 'txt':
-                with open(file_dialog[0], 'r') as f:
-                    text = f.read()
-            elif file_extension == 'docx':
-                document = Document(file_dialog[0])
-                text = '\n'.join([p.text for p in document.paragraphs])
-            elif file_extension == 'xlsx':
-                wb = load_workbook(filename=file_dialog[0])
-                ws = wb.active
-                text = str(ws['A1'].value)
+            if self.file_type == 'docx':
+                for index, line in enumerate(lines):
+                    if index < len(self.doc.paragraphs):
+                        self.doc.paragraphs[index].text = line
+                    else:
+                        self.doc.add_paragraph(line)
+                self.doc.save(self.file_path)
+            elif self.file_type == 'xlsx':
+                for row_index, line in enumerate(lines):
+                    cells = line.split(',')
+                    for col_index, cell_value in enumerate(cells):
+                        self.ws.cell(row=row_index + 1, column=col_index + 1, value=cell_value)
+                self.wb.save(self.file_path)
 
-            # Set the text area widget value to the contents of the file
-            self.text_area.value = text
+    def open_file(self, instance):
+            self.manager.current = 'filechooser'
 
-
-def main():
-    return TextEditor('Text Editor', 'com.example.texteditor')
-
+class DocxEditorApp(App):
+    def build(self):
+        screen_manager = ScreenManager()
+        screen_manager.add_widget(FileChooserScreen(name='filechooser'))
+        screen_manager.add_widget(EditorScreen(name='editor'))
+        return screen_manager
 
 if __name__ == '__main__':
-    main().main_loop()
+    DocxEditorApp().run()
+
