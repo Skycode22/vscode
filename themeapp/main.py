@@ -11,6 +11,7 @@ openai.api_key = "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"
 # Create the GUI window
 window = tk.Tk()
 window.title("Random Code Generator")
+window.configure(bg='#ADD8E6')
 
 
 # Define the function for generating a random code
@@ -60,6 +61,6 @@ response_text.config(yscrollcommand=scrollbar.set)
 
 copy_button = tk.Button(window, text="Copy Selected Text", command=copy_to_clipboard)
 copy_button.pack(pady=10)
-
+copy_button.configure(bg='#ADD8E6')
 # Run the GUI window
 window.mainloop()
