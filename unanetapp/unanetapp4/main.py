@@ -22,7 +22,7 @@ class MainWindow(BoxLayout):
         super(MainWindow, self).__init__(**kwargs)
         icon = 'unanet_logo.png'
         button_box = BoxLayout(orientation='vertical')
-        button = ImageButton(source=icon, size_hint=(0.5, 0.5))
+        button = ImageButton(source=icon, size_hint=(1, 1))
         button_box.add_widget(button)
         label = Label(text="Enter your own text here", font_size=30)
         button_box.add_widget(label)
