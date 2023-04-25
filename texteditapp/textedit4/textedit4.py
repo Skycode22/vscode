@@ -6,14 +6,11 @@ from kivy.uix.button import Button
 from kivy.uix.filechooser import FileChooserIconView
 from kivy.uix.popup import Popup
 from docx import Document
-from kivy.config import Config
-Config.set('graphics', 'width', '1080')
-Config.set('graphics', 'height', '1920')
 
 class MainApp(App):
     def build(self):
         main_layout = BoxLayout(orientation="vertical", padding=1, spacing=5)
-        self.text_input = TextInput(hint_text="Type your text here", multiline=True, size_hint_y=0.8, cursor_color=(0, 1, 0, 1))
+        self.text_input = TextInput(hint_text="Type your text here", multiline=True, size_hint_y=0.8, cursor_color=(.25, .25, .5, 1))
         main_layout.add_widget(self.text_input)
 
         button_layout = BoxLayout(size_hint_y=0.1)
@@ -49,6 +46,8 @@ class MainApp(App):
                 text = f.read()
 
         self.text_input.text = text
+        self.text_input.cursor = (0, 0)
+        self.text_input.scroll_y = 1 
         self.file_chooser_popup.dismiss()
 
     def save_file(self, _):
