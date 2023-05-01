@@ -20,7 +20,7 @@ class ImageButton(ButtonBehavior, AsyncImage):
 class MainWindow(BoxLayout):
     def __init__(self, **kwargs):
         super(MainWindow, self).__init__(**kwargs)
-        icon = 'unanet_logo.png'
+        icon = 'unalogo1.png'
         button_box = BoxLayout(orientation='vertical', size_hint=(1, 1))
         button = ImageButton(source=icon, size_hint=(1, 1))
         button_box.add_widget(button)
