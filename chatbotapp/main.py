@@ -8,7 +8,7 @@ from kivy.uix.label import Label
 from kivy.properties import ObjectProperty
 
 # Set up the OpenAI API key
-openai.api_key = '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'
+openai.api_key = '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'
 
 # Define the chatbot app
 class ChatbotApp(App):
