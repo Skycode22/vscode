@@ -16,11 +16,11 @@ class FileList(BoxLayout):
 class MainApp(App):
     def build(self):
         # Replace these with the appropriate values for your environment
-        server = 'server_address'
-        username = 'username'
-        password = 'password'
-        share_name = 'share_name'
-        directory = 'directory'
+        server = '192.168.254.4'
+        username = 'skyler.thuss'
+        password = '1234YCG!'
+        share_name = 'ycg-nas'
+        directory = 'Shared'
 
         files = get_files(server, username, password, share_name, directory)
         file_list = FileList(files)
