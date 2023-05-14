@@ -2,13 +2,11 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from datetime import datetime
 import pickle
-
 class Ticket:
     def __init__(self, name, problem):
         self.name = name
         self.problem = problem
         self.date = datetime.now()
-
 class TicketingSystem:
     def __init__(self):
         self.load_tickets()
@@ -40,7 +38,6 @@ class TicketingSystem:
     def save_tickets(self):
         with open('tickets.pkl', 'wb') as f:
             pickle.dump((self.active_tickets, self.archived_tickets), f)
-
 class App:
     def __init__(self, root, ticketing_system):
         self.root = root
