@@ -107,19 +107,11 @@ class App:
                 text=f"#{i}. For {ticket.name} on ({ticket.date.strftime('%Y-%m-%d, %H:%M')}) :{ticket.problem}",
                 font=('Gadugi', 12, "bold"),
                 bg='dark grey',
-                wraplength=1000,
-                anchor='center'  # Set the anchor to 'w' for left alignment
+                wraplength=750,
+                anchor='center',  # Set the anchor to 'center' for center alignment
+                justify='center'  # Set the justify to 'center' for center alignment of multiple lines
             )
-            label.grid(row=i, column=3, sticky='w', padx=10, pady=5)  # Add padx for horizontal centering
-
-            detail_button = tk.Button(self.ticket_frame, text="Details", font=('Gadugi', 12), bg='lightblue')
-            detail_button.grid(row=i, column=4, padx=5, pady=2)
-
-            detail_text = tk.Text(self.ticket_frame, font=('Gadugi', 12), width=40, height=3)
-            detail_text.grid(row=i, column=3, sticky='w', columnspan=2)
-            detail_text.grid_remove()  # Hide it initially
-
-            detail_button['command'] = lambda t=detail_text: self.toggle_detail_text(t)
+            label.grid(row=i, column=3, sticky='nsew', padx=10, pady=5)
 
             archive_button = tk.Button(self.ticket_frame, text="Archive", command=lambda t=ticket: self.archive_ticket(t),
                                     font=('Gadugi', 12), bg='lightblue')
