@@ -50,7 +50,7 @@ class App:
 
         self.root.title('Ticketing System')
 
-        self.bg_image = tk.PhotoImage(file='bg.png')
+        self.bg_image = tk.PhotoImage(file='bg1.png')
         self.background_label = tk.Label(self.root, image=self.bg_image) 
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1) 
         
