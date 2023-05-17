@@ -38,6 +38,11 @@ class TicketingSystem:
     def save_tickets(self):
         with open('tickets.pkl', 'wb') as f:
             pickle.dump((self.active_tickets, self.archived_tickets), f)
+            
+    def edit_ticket(self, old_ticket, new_ticket):
+        index = self.active_tickets.index(old_ticket)
+        self.active_tickets[index] = new_ticket
+        self.save_tickets()        
 class App:
     def __init__(self, root, ticketing_system):
         self.root = root
@@ -119,8 +124,50 @@ class App:
             delete_button = tk.Button(self.ticket_frame, text="Delete", command=lambda t=ticket: self.delete_ticket(t),
                                     font=('Gadugi', 12), bg='lightblue')
             delete_button.grid(row=i, column=1, padx=5, pady=2)
+            edit_button = tk.Button(self.ticket_frame, text="Edit", command=lambda t=ticket: self.edit_ticket(t),
+                                    font=('Gadugi', 12), bg='lightblue')
+            edit_button.grid(row=i, column=0, padx=5, pady=2)
 
         self.ticket_canvas.configure(scrollregion=self.ticket_canvas.bbox('all'))
+
+    def edit_ticket(self, old_ticket):
+        edit_window = tk.Toplevel(self.root)
+        edit_window.title(f"Edit Ticket - Ticket by {old_ticket.name}")
+
+        name_text = tk.StringVar(edit_window, value=old_ticket.name)
+        problem_text = tk.StringVar(edit_window, value=old_ticket.problem)
+
+        name_label = tk.Label(edit_window, text="Employee:", font=('Gadugi', 14))
+        name_label.pack(side='left')
+        name_entry = tk.Entry(edit_window, textvariable=name_text, font=('Gadugi', 14))
+        name_entry.pack(side='left')
+
+        problem_label = tk.Label(edit_window, text="Issue:", font=('Gadugi', 14))
+        problem_label.pack(side='left')
+        problem_entry = tk.Text(edit_window, font=('Gadugi', 14), height=3)
+        problem_entry.insert("1.0", old_ticket.problem)
+        problem_entry.pack(side='left')
+
+        submit_button = tk.Button(
+            edit_window,
+            text="Submit",
+            command=lambda: self.submit_edited_ticket(old_ticket, name_text.get(), problem_entry.get("1.0", tk.END).strip()),
+            font=('Gadugi', 14),
+            bg='#20B2AA'
+        )
+        submit_button.pack(pady=5)
+        edit_window.bind('<Return>', lambda event: self.submit_edited_ticket(old_ticket, name_text.get(), problem_entry.get("1.0", tk.END).strip()))
+
+    def submit_edited_ticket(self, old_ticket, name, problem):
+        if name and problem:
+            new_ticket = Ticket(name, problem)
+            self.ticketing_system.edit_ticket(old_ticket, new_ticket)
+            self.update_ticket_view()
+            for window in self.root.winfo_children():
+                if isinstance(window, tk.Toplevel):
+                    window.destroy()
+        else:
+            messagebox.showerror("Error", "Name and problem description cannot be empty.")
 
     def toggle_detail_text(self, detail_text):  
         if detail_text.winfo_viewable():
@@ -201,10 +248,11 @@ class App:
         unarchive_button = tk.Button(
             detail_window,
             text="Unarchive",
-            command=lambda: self.unarchive_ticket(ticket),
+            command=lambda: self.unarchive_ticket(ticket, detail_window, window),
             font=('Gadugi', 12),
             bg='lightblue'
         )
+
         unarchive_button.pack(pady=5)
 
         delete_button = tk.Button(
@@ -215,11 +263,14 @@ class App:
             bg='lightblue'
         )
         delete_button.pack(pady=5)
-        
-    def unarchive_ticket(self, ticket):
+            
+    def unarchive_ticket(self, ticket, detail_window, window):
         self.ticketing_system.archived_tickets.remove(ticket)
         self.ticketing_system.active_tickets.append(ticket)
         self.update_ticket_view()
+        detail_window.destroy()
+        window.destroy()
+
       
 def main():
     root = tk.Tk()
