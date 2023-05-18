@@ -7,6 +7,7 @@ class Ticket:
         self.name = name
         self.problem = problem
         self.date = datetime.now()
+        self.starred = False
 class TicketingSystem:
     def __init__(self):
         self.load_tickets()
@@ -109,7 +110,7 @@ class App:
         for i, ticket in enumerate(self.ticketing_system.active_tickets, 1):
             label = tk.Label(
                 self.ticket_frame,
-                text=f"#{i}. For {ticket.name} on ({ticket.date.strftime('%Y-%m-%d, %H:%M')}) :{ticket.problem}",
+                text=f"#{i}. On ({ticket.date.strftime('%Y-%m-%d, %H:%M')}) for {ticket.name} :{ticket.problem}",
                 font=('Gadugi', 12, "bold"),
                 bg='dark grey',
                 wraplength=750,
@@ -127,6 +128,11 @@ class App:
             edit_button = tk.Button(self.ticket_frame, text="Edit", command=lambda t=ticket: self.edit_ticket(t),
                                     font=('Gadugi', 12), bg='lightblue')
             edit_button.grid(row=i, column=0, padx=5, pady=2)
+            
+            star_button = tk.Button(self.ticket_frame, text="⭐", command=lambda t=ticket, sb=None: self.toggle_star(t, sb),
+                                    font=('Gadugi', 12), bg='lightblue' if not ticket.starred else 'yellow')
+            star_button.grid(row=i, column=4, padx=5, pady=2)
+            star_button['command'] = lambda t=ticket, sb=star_button: self.toggle_star(t, sb)
 
         self.ticket_canvas.configure(scrollregion=self.ticket_canvas.bbox('all'))
 
@@ -212,7 +218,7 @@ class App:
 
         detail_label = tk.Label(
             detail_window,
-            text=f"Ticket details:\n\nName: {ticket.name}\nDate: {ticket.date.strftime('%Y-%m-%d %H:%M:%S')}\nProblem: {ticket.problem}",
+            text=f"Ticket details:\n\nDate: {ticket.date.strftime('%Y-%m-%d %H:%M:%S')}\nName: {ticket.name}\nProblem: {ticket.problem}",
             font=('Gadugi', 12),
             bg='light grey'
         )
@@ -270,8 +276,11 @@ class App:
         self.update_ticket_view()
         detail_window.destroy()
         window.destroy()
+        
+    def toggle_star(self, ticket, star_button):
+        ticket.starred = not ticket.starred
+        star_button.configure(bg='yellow' if ticket.starred else star_button.master["bg"])
 
-      
 def main():
     root = tk.Tk()
     root.geometry('1000x850')
@@ -282,4 +291,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
