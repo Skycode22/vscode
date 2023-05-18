@@ -280,6 +280,7 @@ class App:
     def toggle_star(self, ticket, star_button):
         ticket.starred = not ticket.starred
         star_button.configure(bg='yellow' if ticket.starred else star_button.master["bg"])
+        self.ticketing_system.save_tickets()
 
 def main():
     root = tk.Tk()
