@@ -43,7 +43,19 @@ class TicketingSystem:
     def edit_ticket(self, old_ticket, new_ticket):
         index = self.active_tickets.index(old_ticket)
         self.active_tickets[index] = new_ticket
-        self.save_tickets()        
+        self.save_tickets()      
+        
+    def move_ticket_up(self, ticket):
+        index = self.active_tickets.index(ticket)
+        if index > 0:
+            self.active_tickets[index], self.active_tickets[index - 1] = self.active_tickets[index - 1], self.active_tickets[index]
+            self.save_tickets()
+
+    def move_ticket_down(self, ticket):
+        index = self.active_tickets.index(ticket)
+        if index < len(self.active_tickets) - 1:
+            self.active_tickets[index], self.active_tickets[index + 1] = self.active_tickets[index + 1], self.active_tickets[index]
+            self.save_tickets()      
 class App:
     def __init__(self, root, ticketing_system):
         self.root = root
@@ -110,13 +122,22 @@ class App:
         for i, ticket in enumerate(self.ticketing_system.active_tickets, 1):
             label = tk.Label(
                 self.ticket_frame,
-                text=f"#{i}. On ({ticket.date.strftime('%Y-%m-%d, %H:%M')}) for {ticket.name} :{ticket.problem}",
+                text=f"#{i}. ({ticket.date.strftime('%Y-%m-%d, %H:%M')}) FOR: {ticket.name}: {ticket.problem}",
                 font=('Gadugi', 12, "bold"),
                 bg='dark grey',
-                wraplength=750,
+                wraplength=600,
                 anchor='center',  # Set the anchor to 'center' for center alignment
                 justify='center'  # Set the justify to 'center' for center alignment of multiple lines
             )
+            
+            move_up_button = tk.Button(self.ticket_frame, text="⇧", command=lambda t=ticket: self.move_ticket_up(t),
+                                       font=('Gadugi', 12), bg='lightblue')
+            move_up_button.grid(row=i, column=5, padx=5, pady=2)
+
+            move_down_button = tk.Button(self.ticket_frame, text="⇩", command=lambda t=ticket: self.move_ticket_down(t),
+                                         font=('Gadugi', 12), bg='lightblue')
+            move_down_button.grid(row=i, column=6, padx=5, pady=2)
+
             label.grid(row=i, column=3, sticky='nsew', padx=10, pady=5)
 
             archive_button = tk.Button(self.ticket_frame, text="Archive", command=lambda t=ticket: self.archive_ticket(t),
@@ -135,6 +156,14 @@ class App:
             star_button['command'] = lambda t=ticket, sb=star_button: self.toggle_star(t, sb)
 
         self.ticket_canvas.configure(scrollregion=self.ticket_canvas.bbox('all'))
+        
+    def move_ticket_up(self, ticket):
+        self.ticketing_system.move_ticket_up(ticket)
+        self.update_ticket_view()
+
+    def move_ticket_down(self, ticket):
+        self.ticketing_system.move_ticket_down(ticket)
+        self.update_ticket_view()    
 
     def edit_ticket(self, old_ticket):
         edit_window = tk.Toplevel(self.root)
