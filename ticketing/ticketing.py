@@ -86,7 +86,7 @@ class App:
         self.ticket_canvas.create_window((0,0), window=self.ticket_frame, anchor='n')
         self.ticket_frame.bind("<Configure>", lambda e: self.ticket_canvas.configure(scrollregion=self.ticket_canvas.bbox("all")))
 
-        self.archive_button = tk.Button(root,borderwidth=3, relief='ridge', text="View Archived Tickets", command=self.view_archived_tickets, font=('Gadugi', 14), bg='#FFFACD')
+        self.archive_button = tk.Button(root,borderwidth=3, relief='ridge', text="View Archived Tickets", command=self.view_archived_tickets, font=('Gadugi', 14), bg='#9370DB')
         self.archive_button.pack(pady=5)
 
         self.update_ticket_view()
