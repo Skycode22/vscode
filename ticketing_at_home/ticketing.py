@@ -66,7 +66,7 @@ class App:
 
         self.root.title('Projects')
 
-        self.bg_image = Image.open('bg6.png')
+        self.bg_image = Image.open('bg1.png')
         self.bg_photoimage = ImageTk.PhotoImage(self.bg_image)
 
         self.background_label = tk.Label(self.root, image=self.bg_photoimage) 
