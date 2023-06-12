@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test</title>
+    <style>
+        #table-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1><u>This is a test, to make a webpage for the first time</u></h1>
+    <a href="https://www.skycode22.com"><b>Skycode22 Website</b></a>
+    <form id="myForm">
+        <label for="fname">First Name:</label>
+        <input type="text" id="fname" name="fname" required><br>
+        <label for="lname">Last Name:</label>
+        <input type="text" id="lname" name="lname" required><br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br>
+        <label for="birthday">Birthday:</label>
+        <input type="date" id="birthday" name="birthday" required><br>
+        <input type="submit" value="Submit">
+    </form>
+    <div id="table-container">
+        <table id="myTable">
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Age</th>
+                <th>Birthday</th>
+            </tr>
+            <tr>
+                <td>John</td>
+                <td>Doe</td>
+                <td>20</td>
+                <td>01/01/2000</td>
+            </tr>
+            <tr>
+                <td>Jane</td>
+                <td>Doe</td>
+                <td>18</td>
+                <td>01/01/2002</td>
+            </tr>
+            <tr>
+                <td>John</td>
+                <td>Smith</td>
+                <td>25</td>
+                <td>01/01/1995</td>
+            </tr>
+        </table>
+    </div>
+    <script>
+        document.getElementById("myForm").addEventListener("submit", function(event) {
+            event.preventDefault(); // Prevent the form from submitting normally
+            // Get form values
+            var fname = document.getElementById("fname").value;
+            var lname = document.getElementById("lname").value;
+            var age = document.getElementById("age").value;
+            var birthday = document.getElementById("birthday").value;
+            // Create a new table row
+            var newRow = document.createElement("tr");
+            // Create table cells and populate with form values
+            var cell1 = document.createElement("td");
+            cell1.textContent = fname;
+            var cell2 = document.createElement("td");
+            cell2.textContent = lname;
+            var cell3 = document.createElement("td");
+            cell3.textContent = age;
+            var cell4 = document.createElement("td");
+            cell4.textContent = birthday;
+            // Append the cells to the new row
+            newRow.appendChild(cell1);
+            newRow.appendChild(cell2);
+            newRow.appendChild(cell3);
+            newRow.appendChild(cell4);
+            // Append the new row to the table
+            var table = document.getElementById("myTable");
+            table.appendChild(newRow);
+            // Reset the form
+            document.getElementById("myForm").reset();
+        });
+    </script>
+</body>
+</html>
