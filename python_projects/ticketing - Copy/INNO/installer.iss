@@ -14,9 +14,10 @@ ArchitecturesInstallIn64BitMode=x64
 [Files]
 Source: "ticketing.exe"; DestDir: "{app}"
 Source: "MyProg.chm"; DestDir: "{app}"
-Source: "Readme.txt"; DestDir: "{app}"; Flags: isreadme
-Source: "bg1.png"; DestDir: "{app}" 
+Source: "Readme.txt"; DestDir: "{app}"
+Source: "bg1.PNG"; DestDir: "{app}" 
 Source: "tickets.pkl"; DestDir: "{app}" 
+Source: "app.manifest"; DestDir: "{app}"
 
 [Icons]
 Name: "{group}\Ticketing"; Filename: "{app}\ticketing.exe"

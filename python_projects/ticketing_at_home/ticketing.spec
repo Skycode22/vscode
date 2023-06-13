@@ -8,7 +8,7 @@ a = Analysis(
     ['ticketing.py'],
     pathex=[],
     binaries=[],
-    datas=[('bg.png', '.')],
+    datas=[('bg1.png', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
