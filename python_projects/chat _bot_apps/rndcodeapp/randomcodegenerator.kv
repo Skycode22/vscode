@@ -1,0 +1,43 @@
+<MainLayout>:
+    orientation: "vertical"
+    topic_input: topic_input
+    language_spinner: language_spinner
+    code_output: code_output
+
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: 0.1
+        Label:
+            text: "Topic:"
+        TextInput:
+            id: topic_input
+            multiline: True
+            size_hint_x: 0.8
+
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: 0.1
+        Label:
+            text: "Language Selection:"
+        Spinner:
+            id: language_spinner
+            values: ["Python", "Java", "JavaScript", "c++", "c#", "PHP", "Ruby", "Swift", "Go", "Rust", "Kotlin", "Dart", "Scala", "R", "C", "Objective-C", "Perl", "Haskell", "Lua", "Julia", "Clojure", "Elixir", "F#", "Groovy", "Matlab", "Visual Basic", "Assembly", "Ada", "COBOL", "D", "Erlang", "Fortran", "Lisp", "Logo", "Pascal", "Prolog", "Racket", "Scheme", "SQL", "TypeScript", "VBScript", "VHDL", "Verilog", "Visual Basic .NET", "Visual Basic Script", "Visual DataFlex", "Visual FoxPro", "Visual J#", "Visual J++", "Visual Objects", "Visual Prolog", "Visual Prolog .NET", "Visual Studio Tools for Applications", "Visual Studio Tools for Office", "Visual Studio .NET", "VisualWorks", "WebDNA", "WebQL", "WebObjects", "WebSphere"]
+
+    Button:
+        text: "Generate Code"
+        size_hint_y: 0.1
+        on_press: root.generate_code()
+
+    ScrollView:
+        size_hint_y: 0.6
+        TextInput:
+            id: code_output
+            readonly: True
+            background_color: 1, 1, 1, 1
+            foreground_color: 0, 0, 0, 1
+            multiline: True
+
+    Button:
+        text: "Copy Selected Text"
+        size_hint_y: 0.1
+        on_press: root.copy_to_clipboard()
