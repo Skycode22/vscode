@@ -15,7 +15,7 @@ LRESULT CALLBACK WindowProcedure(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPa
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
 {
-    const char CLASS_NAME[] = "Sample Window Class";
+    const wchar_t CLASS_NAME[] = L"Sample Window Class";
 
     WNDCLASS wc = {};
 
@@ -25,15 +25,15 @@ int WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR, int nCmdShow)
 
     if(!RegisterClass(&wc))
     {
-        MessageBox(NULL, "Window Registration Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+        MessageBox(NULL, L"Window Registration Failed!", L"Error!", MB_ICONEXCLAMATION | MB_OK);
         return 0;
     }
 
-    HWND hwnd = CreateWindow(CLASS_NAME, "Sample Window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 500, 500, NULL, NULL, hInst, NULL);
+    HWND hwnd = CreateWindowW(CLASS_NAME, L"Sample Window", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 500, 500, NULL, NULL, hInst, NULL);
 
     if(hwnd == NULL)
     {
-        MessageBox(NULL, "Window Creation Failed!", "Error!", MB_ICONEXCLAMATION | MB_OK);
+        MessageBox(NULL, L"Window Creation Failed!", L"Error!", MB_ICONEXCLAMATION | MB_OK);
         return 0;
     }
 
