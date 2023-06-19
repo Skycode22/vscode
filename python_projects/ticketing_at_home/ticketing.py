@@ -2,15 +2,12 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 from datetime import datetime
 import pickle
-from PIL import Image, ImageTk
-
 class Ticket:
     def __init__(self, name, problem):
         self.name = name
         self.problem = problem
         self.date = datetime.now()
         self.starred = False
-
 class TicketingSystem:
     def __init__(self):
         self.load_tickets()
@@ -58,25 +55,27 @@ class TicketingSystem:
         index = self.active_tickets.index(ticket)
         if index < len(self.active_tickets) - 1:
             self.active_tickets[index], self.active_tickets[index + 1] = self.active_tickets[index + 1], self.active_tickets[index]
-            self.save_tickets()      
+            self.save_tickets()     
+            
+    def move_ticket_to_top(self, ticket):
+        self.active_tickets.remove(ticket)
+        self.active_tickets.insert(0, ticket)
+        self.save_tickets()
+
+    def move_ticket_to_bottom(self, ticket):
+        self.active_tickets.remove(ticket)
+        self.active_tickets.append(ticket)
+        self.save_tickets()         
 class App:
     def __init__(self, root, ticketing_system):
         self.root = root
         self.ticketing_system = ticketing_system
 
-        self.root.title('Projects')
+        self.root.title('Ticketing System')
 
-        self.bg_image = Image.open('bg1.png')
-        self.bg_photoimage = ImageTk.PhotoImage(self.bg_image)
-
-        self.background_label = tk.Label(self.root, image=self.bg_photoimage) 
+        self.bg_image = tk.PhotoImage(file='bg1.png')
+        self.background_label = tk.Label(self.root, image=self.bg_image) 
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1) 
-
-        self.root.bind("<Configure>", self.resize)
-        self.root.bind("<Map>", self.on_deiconify)
-        self.root.after(500, self.check_resize)
-
-        self.old_width, self.old_height = self.root.winfo_width(), self.root.winfo_height()
         
         self.name_text = tk.StringVar()
         self.problem_text = tk.StringVar()
@@ -90,7 +89,7 @@ class App:
 
         self.problem_frame = tk.Frame(root, borderwidth=5, relief='groove', bg='lightblue') 
         self.problem_frame.pack(pady=5)
-        self.problem_label = tk.Label(self.problem_frame, text="Detail:", font=('Gadugi', 14), bg='lightblue')
+        self.problem_label = tk.Label(self.problem_frame, text="Details:", font=('Gadugi', 14), bg='lightblue')
         self.problem_label.pack(side='left')
         self.problem_entry = tk.Text(self.problem_frame, font=('Gadugi', 14), width=75, height=3)
         self.problem_entry.pack(side='left')
@@ -113,30 +112,6 @@ class App:
         self.archive_button.pack(pady=5)
 
         self.update_ticket_view()
-
-    def resize(self, event):
-        width, height = event.width, event.height
-        self.bg_image_resized = self.bg_image.resize((width, height))
-        self.bg_photoimage = ImageTk.PhotoImage(self.bg_image_resized)
-        self.background_label.config(image=self.bg_photoimage)
-
-    def on_deiconify(self, event):
-        self.root.update_idletasks()
-        width, height = self.root.winfo_width(), self.root.winfo_height()
-        self.bg_image_resized = self.bg_image.resize((width, height))
-        self.bg_photoimage = ImageTk.PhotoImage(self.bg_image_resized)
-        self.background_label.config(image=self.bg_photoimage)
-
-    def check_resize(self):
-        width, height = self.root.winfo_width(), self.root.winfo_height()
-
-        if width != self.old_width or height != self.old_height:
-            self.bg_image_resized = self.bg_image.resize((width, height))
-            self.bg_photoimage = ImageTk.PhotoImage(self.bg_image_resized)
-            self.background_label.config(image=self.bg_photoimage)
-
-        self.old_width, self.old_height = width, height
-        self.root.after(500, self.check_resize)
 
     def submit_ticket(self, event=None):
         name = self.name_text.get()
@@ -172,6 +147,15 @@ class App:
             move_down_button = tk.Button(self.ticket_frame, text="⇩", command=lambda t=ticket: self.move_ticket_down(t),
                                          font=('Gadugi', 12), bg='lightblue')
             move_down_button.grid(row=i, column=6, padx=5, pady=2)
+            
+            move_to_top_button = tk.Button(self.ticket_frame, text="⤒", command=lambda t=ticket: self.move_ticket_to_top(t),
+                                           font=('Gadugi', 12), bg='lightblue')
+            move_to_top_button.grid(row=i, column=7, padx=5, pady=2)
+
+            move_to_bottom_button = tk.Button(self.ticket_frame, text="⤓", command=lambda t=ticket: self.move_ticket_to_bottom(t),
+                                              font=('Gadugi', 12), bg='lightblue')
+            move_to_bottom_button.grid(row=i, column=8, padx=5, pady=2)
+          
 
             label.grid(row=i, column=3, sticky='nsew', padx=10, pady=5)
 
@@ -198,6 +182,14 @@ class App:
 
     def move_ticket_down(self, ticket):
         self.ticketing_system.move_ticket_down(ticket)
+        self.update_ticket_view()    
+        
+    def move_ticket_to_top(self, ticket):
+        self.ticketing_system.move_ticket_to_top(ticket)
+        self.update_ticket_view()
+
+    def move_ticket_to_bottom(self, ticket):
+        self.ticketing_system.move_ticket_to_bottom(ticket)
         self.update_ticket_view()    
 
     def edit_ticket(self, old_ticket):
@@ -257,9 +249,20 @@ class App:
         window = tk.Toplevel(self.root)
         window.title('Archived Tickets')
         window.configure(bg='light grey')
+
+        canvas = tk.Canvas(window, bg='light grey')  
+        frame = tk.Frame(canvas, bg='light grey') 
+        scrollbar = ttk.Scrollbar(window, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scrollbar.set)
+        scrollbar.pack(side="right", fill="y")
+        canvas.pack(side="top", fill="both", expand=True)
+        canvas.create_window((0,0), window=frame, anchor='n')
+
+        frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+
         for i, ticket in enumerate(self.ticketing_system.archived_tickets, 1):
             label = tk.Label(
-                window,
+                frame,
                 text=f"Archived Ticket {i} by {ticket.name} on {ticket.date.strftime('%Y-%m-%d %H:%M')}: {ticket.problem}",
                 font=('Gadugi', 12),
                 bg='dark grey'
@@ -267,13 +270,15 @@ class App:
             label.pack(pady=5)
 
             detail_button = tk.Button(
-                window,
+                frame,
                 text="View Details",
                 command=lambda t=ticket: self.view_archived_ticket_details(t, window),
                 font=('Gadugi', 12),
                 bg='lightblue'
             )
             detail_button.pack(pady=5)
+
+        canvas.configure(scrollregion=canvas.bbox('all'))
 
     def view_archived_ticket_details(self, ticket, window):
         detail_window = tk.Toplevel(window)
