@@ -5,7 +5,13 @@ import tkinter.scrolledtext as tkst
 import tkinter.simpledialog as tkdialog
 import clipboard
 import math
-openai.api_key = "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"
+def get_api_key():
+    api_key = tkdialog.askstring("API Key", "Please enter your API key:")
+    if api_key is None:
+        messagebox.showerror("Error", "API key is required to proceed.")
+        window.quit()
+    return api_key
+openai.api_key = get_api_key()
 window = tk.Tk()
 window.title("Random Code Generator")
 window.configure(bg='#ADD8E6')

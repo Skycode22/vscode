@@ -6,7 +6,7 @@ from kivy.uix.recycleboxlayout import RecycleBoxLayout
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.properties import ObjectProperty, StringProperty
 from kivy.lang import Builder
-from plyer import wifi, btadapter
+from plyer import wifi, bluetooth
 
 kivy.require('2.0.0')
 
@@ -26,6 +26,13 @@ Builder.load_string("""
         height: self.minimum_height
         orientation: 'vertical'
         spacing: dp(2)
+        
+<WifiBluetoothScanner>:
+    orientation: 'vertical'
+    RV:
+        id: wifi_list
+    RV:
+        id: bluetooth_list
 """)
 
 class WifiBluetoothItem(ButtonBehavior, BoxLayout):
@@ -39,8 +46,12 @@ class RV(RecycleView):
         super(RV, self).__init__(**kwargs)
 
 class WifiBluetoothScanner(BoxLayout):
-    wifi_list = ObjectProperty()
-    bluetooth_list = ObjectProperty()
+    def __init__(self, **kwargs):
+        super(WifiBluetoothScanner, self).__init__(**kwargs)
+        self.wifi_list = self.ids['wifi_list']
+        self.bluetooth_list = self.ids['bluetooth_list']
+        self.scan_wifi()
+        self.scan_bluetooth()
 
     def scan_wifi(self):
         wifi_scan_result = wifi.get_access_points()
@@ -48,7 +59,7 @@ class WifiBluetoothScanner(BoxLayout):
         self.wifi_list.data = wifi_networks
 
     def scan_bluetooth(self):
-        paired_devices = btadapter.get_bonded_devices()
+        paired_devices = bluetooth.get_bonded_devices()
         bluetooth_devices = [{'text': device['name']} for device in paired_devices]
         self.bluetooth_list.data = bluetooth_devices
 
